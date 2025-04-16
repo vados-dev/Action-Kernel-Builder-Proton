@@ -20,7 +20,7 @@ on:
         required: true
         default: 'sl8541e_defconfig'
       KERNEL_ARCH:
-        description: 'Kernel defconfig'
+        description: 'Kernel arch'
         required: true
         type: choice
         default: 'arm'
