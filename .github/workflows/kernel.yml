@@ -87,6 +87,8 @@ jobs:
 
     - name: 🧮 Set Properties
       run: |
+        sudo rm -f /bin/sh
+        sudo ln -s /bin/bash /bin/sh
         echo "BUILD_DATE=$(TZ=Europe/Moscow date +%Y%m%d)" >> $GITHUB_ENV
 
     - name: 🤞 Build Kernel
@@ -95,15 +97,16 @@ jobs:
         KERNEL_PATH: ${{ github.workspace }}/android/kernel
         BOARD_PATH: '${{ github.workspace }}/android/kernel/sprd-board-config/sharkle/sl8541e_1h10_go/sl8541e_cus_go'
         TARGET_BOARD: 'sl8541e_cus_go'
+        CC: '${{ github.workspace }}/android/toolchains/proton-clang/bin/clang'
 
       run: |
         cd android/kernel
         export "PATH=${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH"
         #export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`
         
-        if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
-          ./compile_environment.py 4
-          #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.KERNEL_DEFCONFIG }}
+        #if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
+        #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.KERNEL_DEFCONFIG }}
+          #./compile_environment.py 4 
           make -j$NUMBEROFCPUS O=out ARCH=$ARCH \
                                      CC=clang \
                                      AR=llvm-ar \
@@ -120,9 +123,9 @@ jobs:
                                      CROSS_COMPILE=arm-linux-gnueabi- \
                                      CLANG_TRIPLE=arm-linux-gnueabi-
         #else
-        fi
-          #./compile_environment.py 4
           #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
+          ./compile_environment.py 4 make -j$NUMBEROFCPUS O=out -f AndroidKernel.mk ARCH=$ARCH
+          
           #make -j$NUMBEROFCPUS O=out -f AndroidKernel.mk ARCH=$ARCH CC=clang AR=llvm-ar AS=llvm-as NM=llvm-nm STRIP=llvm-strip OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
                                      #OBJSIZE=llvm-size READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar CROSS_COMPILE=arm-linux-gnueabi- CLANG_TRIPLE=arm-linux-gnueabi- \
                                      #${{ inputs.EXTRA_CMDS }}
