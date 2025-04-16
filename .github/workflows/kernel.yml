@@ -47,6 +47,8 @@ on:
 jobs:
   build:
     name: Build Kernel by ${{ github.actor }}
+      export DOCKER_DEFAULT_PLATFORM=linux/amd64
+      
     runs-on: ubuntu-20.04
     if: github.event.repository.owner.id == github.event.sender.id
     permissions:
