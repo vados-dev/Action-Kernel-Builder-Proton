@@ -96,7 +96,7 @@ jobs:
         export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`
         if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
           #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.KERNEL_DEFCONFIG }}
-          python3 ./compile_environment.py
+          ./compile_environment.py 4
           make -j$NUMBEROFCPUS O=out ARCH=$ARCH \
                                      CC=clang \
                                      AR=llvm-ar \
@@ -113,7 +113,7 @@ jobs:
                                      CROSS_COMPILE=arm-linux-gnueabi- \
                                      CLANG_TRIPLE=arm-linux-gnueabi-
         else
-          python3 ./compile_environment.py
+          ./compile_environment.py 4
           #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
           make -j$NUMBEROFCPUS O=out ARCH=$ARCH
                                      CC=clang \
