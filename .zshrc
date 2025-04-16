@@ -83,7 +83,7 @@ export HOMEBREW_AUTO_UPDATE_SECS=604800
 # Usage: dockrun, or dockrun [centos7|fedora27|debian9|debian8|ubuntu1404|etc.]
 # Run on arm64 if getting errors: `export DOCKER_DEFAULT_PLATFORM=linux/amd64`
 dockrun() {
- docker run -it vados-dev/docker-"${1:-ubuntu1604}"-ansible /bin/bash
+ docker run -it vados-dev/docker-"${1:-latest}"-ansible /bin/bash
 }
 
 # Enter a running Docker container.
