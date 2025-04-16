@@ -77,7 +77,7 @@ jobs:
 
     - name: Set Properties
       run: |
-        echo "BUILD_DATE=$(TZ=Asia/Manila date +%Y%m%d)" >> $GITHUB_ENV
+        echo "BUILD_DATE=$(TZ=Europe/Moscow date +%Y%m%d)" >> $GITHUB_ENV
 
     - name: Build Kernel
       run: |
