@@ -2,7 +2,7 @@ FROM ubuntu:20.04
 LABEL maintainer="Jeff Geerling"
 
 ARG DEBIAN_FRONTEND=noninteractive
-
+ENV export DOCKER_DEFAULT_PLATFORM=linux/amd64
 ENV pip_packages "ansible"
 
 # Install dependencies.
