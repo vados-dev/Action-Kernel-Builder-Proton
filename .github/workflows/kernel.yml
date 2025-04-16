@@ -50,14 +50,10 @@ jobs:
     name: "Build kernel by ${{ github.actor }}"
     runs-on: ubuntu-22.04
     env:     
+      GITHUB_TOKEN: ${{ secrets.amster }}
       ARCH: ${{ inputs.KERNEL_ARCH }}
       SUB_ARCH: ${{ inputs.KERNEL_ARCH }}
-      GITHUB_TOKEN: ${{ secrets.amster }}
-      BUILD_FROM_KERNEL: 'yes'
-      BOARD_DIR: 'android/kernel'
-      KERNEL_PATH: ${{ github.workspace }}/${{ env.BOARD_DIR }}
-      BOARD_PATH: 'sprd-board-config/sharkle/sl8541e_1h10_go/sl8541e_cus_go'
-      TARGET_BOARD: 'sl8541e_cus_go'
+
     if: github.event.repository.owner.id == github.event.sender.id
     permissions:
       contents: write
@@ -94,12 +90,19 @@ jobs:
         echo "BUILD_DATE=$(TZ=Europe/Moscow date +%Y%m%d)" >> $GITHUB_ENV
 
     - name: 🤞 Build Kernel
+      env:
+        BUILD_FROM_KERNEL: 'yes'
+        KERNEL_PATH: ${{ github.workspace }}/android/kernel
+        BOARD_PATH: '${{ github.workspace }}/android/kernel/sprd-board-config/sharkle/sl8541e_1h10_go/sl8541e_cus_go'
+        TARGET_BOARD: 'sl8541e_cus_go'
+
       run: |
         cd android/kernel
         export "PATH=${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH"
-        export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`
-        ./compile_environment.py 4
+        #export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`
+        
         if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
+          ./compile_environment.py 4
           #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.KERNEL_DEFCONFIG }}
           make -j$NUMBEROFCPUS O=out ARCH=$ARCH \
                                      CC=clang \
