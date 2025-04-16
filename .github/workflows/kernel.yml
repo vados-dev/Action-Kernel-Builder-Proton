@@ -53,7 +53,11 @@ jobs:
       ARCH: ${{ inputs.KERNEL_ARCH }}
       SUB_ARCH: ${{ inputs.KERNEL_ARCH }}
       GITHUB_TOKEN: ${{ secrets.amster }}
-      
+      BUILD_FROM_KERNEL: 'yes'
+      BOARD_DIR: 'android/kernel'
+      KERNEL_PATH: ${{ github.workspace }}/${{ env.BOARD_DIR }}
+      BOARD_PATH: 'sprd-board-config/sharkle/sl8541e_1h10_go/sl8541e_cus_go'
+      TARGET_BOARD: 'sl8541e_cus_go'
     if: github.event.repository.owner.id == github.event.sender.id
     permissions:
       contents: write
@@ -115,22 +119,9 @@ jobs:
         else
           ./compile_environment.py 4
           #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
-          make -j$NUMBEROFCPUS O=out ARCH=$ARCH
-                                     CC=clang \
-                                     AR=llvm-ar \
-                                     AS=llvm-as \
-                                     NM=llvm-nm \
-                                     STRIP=llvm-strip \
-                                     OBJCOPY=llvm-objcopy \
-                                     OBJDUMP=llvm-objdump \
-                                     OBJSIZE=llvm-size \
-                                     READELF=llvm-readelf \
-                                     HOSTCC=clang \
-                                     HOSTCXX=clang++ \
-                                     HOSTAR=llvm-ar \
-                                     CROSS_COMPILE=arm-linux-gnueabi- \
-                                     CLANG_TRIPLE=arm-linux-gnueabi- \
-                                     ${{ inputs.EXTRA_CMDS }}
+          #make -j$NUMBEROFCPUS O=out -f AndroidKernel.mk ARCH=$ARCH CC=clang AR=llvm-ar AS=llvm-as NM=llvm-nm STRIP=llvm-strip OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
+                                     #OBJSIZE=llvm-size READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar CROSS_COMPILE=arm-linux-gnueabi- CLANG_TRIPLE=arm-linux-gnueabi- \
+                                     #${{ inputs.EXTRA_CMDS }}
         fi
 
     - name: ⚠️ Check Kernel
