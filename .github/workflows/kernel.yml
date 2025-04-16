@@ -95,7 +95,8 @@ jobs:
         export "PATH=${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH"
         export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`
         if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
-          make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.KERNEL_DEFCONFIG }}
+          #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.KERNEL_DEFCONFIG }}
+          python3 ./compile_environment.py
           make -j$NUMBEROFCPUS O=out ARCH=$ARCH \
                                      CC=clang \
                                      AR=llvm-ar \
@@ -112,7 +113,8 @@ jobs:
                                      CROSS_COMPILE=arm-linux-gnueabi- \
                                      CLANG_TRIPLE=arm-linux-gnueabi-
         else
-          make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
+          python3 ./compile_environment.py
+          #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
           make -j$NUMBEROFCPUS O=out ARCH=$ARCH
                                      CC=clang \
                                      AR=llvm-ar \
