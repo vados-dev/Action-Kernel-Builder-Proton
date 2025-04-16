@@ -90,31 +90,45 @@ jobs:
         echo "BUILD_DATE=$(TZ=Europe/Moscow date +%Y%m%d)" >> $GITHUB_ENV
 
     - name: 🤞 Build Kernel
-      env:
-          PATH: ${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH
-          CROSS_COMPILE: ${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin/arm-linux-gnueabi-
-          CC: clang
-          CLANG_TRIPLE: ${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin/arm-linux-gnueabi-
-          AR: llvm-ar
-          AS: llvm-as
-          NM: llvm-nm
-          STRIP: llvm-strip
-          OBJCOPY: llvm-objcopy
-          OBJDUMP: llvm-objdump
-          OBJSIZE: llvm-size
-          READELF: llvm-readelf
-          HOSTCC: clang
-          HOSTCXX: clang++
-          HOSTAR: llvm-ar
-          
       run: |
         cd android/kernel
+        export "PATH=${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH"
+        export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`
         if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
-          make -j$(nproc --all) O=out ${{ inputs.LLVM_IAS }} ${{ inputs.KERNEL_DEFCONFIG }}
-          make -j$(nproc --all) O=out ${{ inputs.LLVM_IAS }} 
+          make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.KERNEL_DEFCONFIG }}
+          make -j$NUMBEROFCPUS O=out ARCH=$ARCH \
+                                     CC=clang \
+                                     AR=llvm-ar \
+                                     AS=llvm-as \
+                                     NM=llvm-nm \
+                                     STRIP=llvm-strip \
+                                     OBJCOPY=llvm-objcopy \
+                                     OBJDUMP=llvm-objdump \
+                                     OBJSIZE=llvm-size \
+                                     READELF=llvm-readelf \
+                                     HOSTCC=clang \
+                                     HOSTCXX=clang++ \
+                                     HOSTAR=llvm-ar \
+                                     CROSS_COMPILE=arm-linux-gnueabi- \
+                                     CLANG_TRIPLE=arm-linux-gnueabi-
         else
-          make -j$(nproc --all) O=out ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
-          make -j$(nproc --all) O=out ${{ inputs.EXTRA_CMDS }}
+          make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
+          make -j$NUMBEROFCPUS O=out ARCH=$ARCH
+                                     CC=clang \
+                                     AR=llvm-ar \
+                                     AS=llvm-as \
+                                     NM=llvm-nm \
+                                     STRIP=llvm-strip \
+                                     OBJCOPY=llvm-objcopy \
+                                     OBJDUMP=llvm-objdump \
+                                     OBJSIZE=llvm-size \
+                                     READELF=llvm-readelf \
+                                     HOSTCC=clang \
+                                     HOSTCXX=clang++ \
+                                     HOSTAR=llvm-ar \
+                                     CROSS_COMPILE=arm-linux-gnueabi- \
+                                     CLANG_TRIPLE=arm-linux-gnueabi- \
+                                     ${{ inputs.EXTRA_CMDS }}
         fi
 
     - name: ⚠️ Check Kernel
