@@ -46,51 +46,58 @@ on:
 
 jobs:
   build:
-    name: Build Kernel by ${{ github.actor }}
+    name: "Build kernel by ${{ github.actor }}"
     runs-on: ubuntu-22.04
+    env: 
+      DOCKER_DEFAULT_PLATFORM: linux/amd64
+      GITHUB_TOKEN: ${{ secrets.amster }}
     if: github.event.repository.owner.id == github.event.sender.id
     permissions:
       contents: write
-    env: 
-       DOCKER_DEFAULT_PLATFORM: linux/amd64      
+    
     steps:
-    - name: Checkout
+    - name: 📐 Set swap to 11G
+      uses: pierotofy/set-swap-space@master
+      with:
+         swap-size-gb: 11
+          
+    - name: ✨ Checkout
       uses: actions/checkout@v4
       
-    - name: Packages
+    - name: ⭐ Packages
       run: |
         sudo add-apt-repository -y ppa:deadsnakes/ppa
         sudo apt-get update
         sudo apt-get install -y bison flex rsync bison device-tree-compiler bc cpio python3 python-is-python3 python-dev-is-python3
         sudo apt-get install -y libtfm-dev libc6-dev libc6-dev-i386 libc6-dev-i386-amd64-cross
       
-    - name: Setup Proton
+    - name: 🚀 Setup Proton
       run: |
         mkdir -p android && cd android
         git config --global advice.detachedHead false
         git clone --depth=1 https://github.com/kdrag0n/proton-clang -b ${{ inputs.PROTON_RELEASE }} ./toolchains/proton-clang
 
-    - name: Clone Kernel Tree
+    - name: 🌟 Clone Kernel Tree
       run: |
         cd android
         git clone --depth=1 ${{ inputs.KERNEL_TREE }} -b ${{ inputs.KERNEL_BRANCH }} ./kernel
 
-    - name: Set Properties
+    - name: 🧮 Set Properties
       run: |
         echo "BUILD_DATE=$(TZ=Europe/Moscow date +%Y%m%d)" >> $GITHUB_ENV
         echo "[************** Properties **************]"
-        echo $BUILD_DATE\n
+        echo $BUILD_DATE
         echo $GITHUB_ENV
         echo $DOCKER_DEFAULT_PLATFORM
 
-    - name: Build Kernel
+    - name: 🤞 Build Kernel
       run: |
         cd android/kernel
         export PATH="${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH"
         export ARCH=${{ inputs.KERNEL_ARCH }}        
         export CROSS_COMPILE=arm-linux-gnueabi-
         export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-        export CROSS_COMPILE_COMPAT=aarch64-linux-gnu-
+        export CROSS_COMPILE_COMPAT=arm-linux-gnueabi-
         if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
           make -j$(nproc --all) CC=clang O=out LD=ld.lld LLVM=1 ${{ inputs.LLVM_IAS }} ${{ inputs.KERNEL_DEFCONFIG }}
           make -j$(nproc --all) CC=clang O=out LD=ld.lld LLVM=1 ${{ inputs.LLVM_IAS }} 
@@ -99,7 +106,7 @@ jobs:
           make -j$(nproc --all) CC=clang O=out LD=ld.lld LLVM=1 ${{ inputs.LLVM_IAS }} ${{ inputs.EXTRA_CMDS }}
         fi
 
-    - name: Check Kernel
+    - name: ⚠️ Check Kernel
       run: |
         cd android
         if [ -f kernel/out/arch/${{ inputs.KERNEL_ARCH }}/boot/${{ inputs.KERNEL_IMAGE_NAME }} ]; then
@@ -110,7 +117,7 @@ jobs:
             exit 1
         fi
            
-    - name: Compress Kernel
+    - name: 🪗 Compress Kernel
       if: env.KERNEL_IS_OK == 'true'
       run: |
         cd android
@@ -121,7 +128,7 @@ jobs:
         cd AnyKernel3/
         zip -r9 UPDATE-AnyKernel3-${{ env.BUILD_DATE }}-proton.zip * -x .git README.md *placeholder
 
-    - name: Upload to Release
+    - name: 🫡 Upload to Release
       if: env.KERNEL_IS_OK == 'true'
       uses: softprops/action-gh-release@v2
       with:
