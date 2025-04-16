@@ -49,14 +49,11 @@ jobs:
   build:
     name: "Build kernel by ${{ github.actor }}"
     runs-on: ubuntu-22.04
-    env: 
+    env:     
       ARCH: ${{ inputs.KERNEL_ARCH }}
       SUB_ARCH: ${{ inputs.KERNEL_ARCH }}
-      CROSS_COMPILE: arm-linux-gnueabi-
-      CROSS_COMPILE_ARM32: arm-linux-gnueabi-
-      CROSS_COMPILE_COMPAT: arm-linux-gnueabi-
-      CLANG_TRIPLE: arm-linux-gnueabi-
       GITHUB_TOKEN: ${{ secrets.amster }}
+      
     if: github.event.repository.owner.id == github.event.sender.id
     permissions:
       contents: write
@@ -93,16 +90,34 @@ jobs:
         echo "BUILD_DATE=$(TZ=Europe/Moscow date +%Y%m%d)" >> $GITHUB_ENV
 
     - name: 🤞 Build Kernel
+      env:
+          CROSS_COMPILE: arm-linux-gnueabi-
+          CROSS_COMPILE_ARM32: arm-linux-gnueabi-
+          CROSS_COMPILE_COMPAT: arm-linux-gnueabi-
+          CC: clang
+          CLANG_TRIPLE: arm-linux-gnueabi-
+          AR: llvm-ar
+          AS: llvm-as
+          NM: llvm-nm
+          STRIP: llvm-strip
+          OBJCOPY: llvm-objcopy
+          OBJDUMP: llvm-objdump
+          OBJSIZE: llvm-size
+          READELF: llvm-readelf
+          HOSTCC: clang
+          HOSTCXX: clang++
+          HOSTAR: llvm-ar
+          
       run: |
         cd android/kernel
         export PATH="${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH"
         
         if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
-          make -j$(nproc --all) CC=clang O=out LD=ld.lld LLVM=1 ${{ inputs.LLVM_IAS }} ${{ inputs.KERNEL_DEFCONFIG }}
-          make -j$(nproc --all) CC=clang O=out LD=ld.lld LLVM=1 ${{ inputs.LLVM_IAS }} 
+          make -j$(nproc --all) O=out ${{ inputs.LLVM_IAS }} ${{ inputs.KERNEL_DEFCONFIG }}
+          make -j$(nproc --all) O=out ${{ inputs.LLVM_IAS }} 
         else
-          make -j$(nproc --all) CC=clang O=out LD=ld.lld LLVM=1 ${{ inputs.LLVM_IAS }} ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
-          make -j$(nproc --all) CC=clang O=out LD=ld.lld LLVM=1 ${{ inputs.LLVM_IAS }} ${{ inputs.EXTRA_CMDS }}
+          make -j$(nproc --all) O=out ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
+          make -j$(nproc --all) O=out ${{ inputs.EXTRA_CMDS }}
         fi
 
     - name: ⚠️ Check Kernel
