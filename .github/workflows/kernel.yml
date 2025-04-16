@@ -91,11 +91,10 @@ jobs:
 
     - name: 🤞 Build Kernel
       env:
-          CROSS_COMPILE: arm-linux-gnueabi-
-          CROSS_COMPILE_ARM32: arm-linux-gnueabi-
-          CROSS_COMPILE_COMPAT: arm-linux-gnueabi-
+          PATH: ${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH
+          CROSS_COMPILE: ${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin/arm-linux-gnueabi-
           CC: clang
-          CLANG_TRIPLE: arm-linux-gnueabi-
+          CLANG_TRIPLE: ${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin/arm-linux-gnueabi-
           AR: llvm-ar
           AS: llvm-as
           NM: llvm-nm
@@ -110,8 +109,6 @@ jobs:
           
       run: |
         cd android/kernel
-        export PATH="${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH"
-        
         if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
           make -j$(nproc --all) O=out ${{ inputs.LLVM_IAS }} ${{ inputs.KERNEL_DEFCONFIG }}
           make -j$(nproc --all) O=out ${{ inputs.LLVM_IAS }} 
