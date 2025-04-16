@@ -124,7 +124,7 @@ jobs:
                                      CLANG_TRIPLE=arm-linux-gnueabi-
         #else
           #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
-          ./compile_environment.py 4 make -j$NUMBEROFCPUS O=out -f AndroidKernel.mk ARCH=$ARCH
+          ./compile_environment.py 4 || ARCH=$ARCH make -j$NUMBEROFCPUS -f AndroidKernel.mk
           
           #make -j$NUMBEROFCPUS O=out -f AndroidKernel.mk ARCH=$ARCH CC=clang AR=llvm-ar AS=llvm-as NM=llvm-nm STRIP=llvm-strip OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
                                      #OBJSIZE=llvm-size READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar CROSS_COMPILE=arm-linux-gnueabi- CLANG_TRIPLE=arm-linux-gnueabi- \
