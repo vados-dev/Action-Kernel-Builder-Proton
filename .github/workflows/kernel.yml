@@ -102,9 +102,9 @@ jobs:
       run: |
         cd android/kernel
         export "PATH=${GITHUB_WORKSPACE}/android/toolchains/proton-clang/bin:$PATH"
-        #export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`
+        export NUMBEROFCPUS=`grep 'processor' /proc/cpuinfo | wc -l`
         
-        #if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
+        if [ -z ${{ inputs.EXTRA_CMDS }} ]; then
         #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.KERNEL_DEFCONFIG }}
           #./compile_environment.py 4 
           make -j$NUMBEROFCPUS O=out ARCH=$ARCH \
@@ -122,9 +122,10 @@ jobs:
                                      HOSTAR=llvm-ar \
                                      CROSS_COMPILE=arm-linux-gnueabi- \
                                      CLANG_TRIPLE=arm-linux-gnueabi-
+        fi
         #else
           #make -j$NUMBEROFCPUS O=out ARCH=$ARCH ${{ inputs.EXTRA_CMDS }} ${{ inputs.KERNEL_DEFCONFIG }}
-          ./compile_environment.py 4 || ARCH=$ARCH make -j$NUMBEROFCPUS -f AndroidKernel.mk
+          ./compile_environment.py 4 || make AndroidKernel.mk
           
           #make -j$NUMBEROFCPUS O=out -f AndroidKernel.mk ARCH=$ARCH CC=clang AR=llvm-ar AS=llvm-as NM=llvm-nm STRIP=llvm-strip OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump \
                                      #OBJSIZE=llvm-size READELF=llvm-readelf HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar CROSS_COMPILE=arm-linux-gnueabi- CLANG_TRIPLE=arm-linux-gnueabi- \
